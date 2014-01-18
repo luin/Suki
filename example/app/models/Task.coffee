@@ -1,4 +1,4 @@
-module.exports = class extends require('../../../src').Model
+module.exports = class extends require('../../..').Model
 
   @defineProperties: (DataTypes) ->
     title: DataTypes.STRING
