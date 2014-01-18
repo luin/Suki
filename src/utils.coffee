@@ -19,7 +19,7 @@ exports.mapControllerToRoute = (app, Controller) ->
         instance.req = req
         instance.res = res
         instance.next = next
-        models = app.get 'suki.models'
+        models = app.get 'models'
         instance.db = {}
         for model in models
           instance.db[model.modelName] = model.model
