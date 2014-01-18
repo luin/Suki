@@ -20,15 +20,15 @@ requireDirectory = (directory) ->
 
 Suki = (option = {}) ->
   app = express()
-  app.use(express.bodyParser())
-  app.use(express.methodOverride())
+  app.use express.bodyParser()
+  app.use express.methodOverride()
   appDirectory =
-    option.appDirectory or path.dirname module.parent.filename
+    option.appDirectory or path.dirname module.parent.parent.filename
 
   controllers =
     requireDirectory path.join appDirectory, 'app', 'controllers'
 
-  app.set 'suki.controllers', controllers
+  app.set 'controllers', controllers
 
   for controller in controllers
     utils.mapControllerToRoute app, controller
@@ -41,7 +41,7 @@ Suki = (option = {}) ->
   models =
     requireDirectory path.join appDirectory, 'app', 'models'
 
-  app.set 'suki.models', models
+  app.set 'models', models
 
   for model in models
     model.modelName = utils.inflection.toModel model.moduleName
