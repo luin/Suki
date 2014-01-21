@@ -1,13 +1,13 @@
 module.exports = class extends require('../../..').Controller
 
   # POST /tasks
-  create: ->
-    task = @db.Task.create { title: @req.body.title }
+  create: (Task) ->
+    task = Task.create { title: @req.body.title }
     @res.json task
 
   # GET /tasks
-  index: ->
-    @res.json @db.Task.findAll()
+  index: (Task) ->
+    @res.json Task.findAll()
 
   # GET /tasks/:id
   get: ->

@@ -20,17 +20,23 @@ exports.mapControllerToRoute = (app, Controller) ->
         instance.res = res
         instance.next = next
         models = app.get 'models'
-        instance.db = {}
+        db = {}
         for model in models
-          instance.db[model.modelName] = model.model
+          db[model.modelName] = model.model
 
-        if req.params[idName] and instance.db[modelName]
-          instance.db[modelName]
+        injections = di instance[method].toString()
+        injections = injections.map (injection) ->
+          if db[injection] then db[injection]
+          else if app.get injection then app.get injection
+          else throw new Error "Can't find the injection #{injection}"
+
+        if req.params[idName] and db[modelName]
+          db[modelName]
             .find(req.params[idName]).complete (err, result) ->
               instance["_#{instanceName}"] = result
-              instance[method]()
+              instance[method] injections...
         else
-          instance[method]()
+          instance[method] injections...
 
       app[data.verb] url, middlewares
       console.log data.verb, url
@@ -106,3 +112,16 @@ exports.inflection =
   toInstance: (name) ->
     inflection.singularize inflection.camelize name, true
 
+di = (fn) ->
+  FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
+  FN_ARG_SPLIT = /,/
+  FN_ARG = /^\s*(_?)(\S+?)\1\s*$/
+  STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
+  inject = []
+  fnText = fn.toString().replace STRIP_COMMENTS, ''
+  argDecl = fnText.match FN_ARGS
+  argDecl[1].split(FN_ARG_SPLIT).forEach (arg) ->
+    arg.replace FN_ARG, (all, underscore, name) ->
+      inject.push name
+
+  inject
