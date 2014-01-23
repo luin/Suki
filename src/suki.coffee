@@ -35,10 +35,7 @@ Suki = (option = {}) ->
 
   models = {}
   for model in modelList
-    model.modelName = utils.inflection.toModel model.moduleName
-    model.model = sequelize.define model.modelName,
-      model.define(Sequelize),
-      model.config
+    model._initModel Sequelize, sequelize
     models[model.modelName] = model.model
 
   app.set 'models', models
@@ -48,9 +45,8 @@ Suki = (option = {}) ->
   controllers =
     requireDirectory path.join appDirectory, 'app', 'controllers'
 
-  app.set 'controllers', controllers
   for controller in controllers
-    controller._mapToRoute app
+    controller._mapToRoute app, option
 
   app
 

@@ -52,7 +52,7 @@ module.exports = Controller = class
 
       @supportMethods[method].beforeActions.push action
 
-  @_mapToRoute: (app) ->
+  @_mapToRoute: (app, option) ->
     # Get models
     models = app.get 'models'
 
@@ -78,7 +78,8 @@ module.exports = Controller = class
           .replace('{{module}}', routerName)
           .replace('{{id}}', ":#{idName}")
 
-        middlewares = [utils.resolvePromise]
+        unless option.resolvePromise is false
+          middlewares = [utils.resolvePromise]
 
         # Store instance to `req`
         middlewares.push (req, res, next) =>

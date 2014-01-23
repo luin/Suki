@@ -71,7 +71,7 @@ exports.inflection =
   toInstance: (name) ->
     inflection.singularize inflection.camelize name, true
 
-exports.di = di = (fn) ->
+exports.di = (fn) ->
   FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
   FN_ARG_SPLIT = /,/
   FN_ARG = /^\s*(_?)(\S+?)\1\s*$/
