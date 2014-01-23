@@ -1,45 +1,4 @@
 exports.mapControllerToRoute = (app, Controller) ->
-  for own method, data of Controller.supportMethods
-    do (method, data) ->
-      unless Controller.prototype[method] then return
-
-      routerName = exports.inflection.toRouter Controller.moduleName
-      idName     = exports.inflection.toId Controller.moduleName
-      modelName  = exports.inflection.toModel Controller.moduleName
-      instanceName  = exports.inflection.toInstance Controller.moduleName
-      url = data.url
-        .replace('{{module}}', routerName)
-        .replace('{{id}}', ":#{idName}")
-
-      middlewares = data.middlewares or []
-      middlewares.unshift exports.resolvePromise
-
-      middlewares.push (req, res, next) ->
-        instance = new Controller()
-        instance.req = req
-        instance.res = res
-        instance.next = next
-        models = app.get 'models'
-        db = {}
-        for model in models
-          db[model.modelName] = model.model
-
-        injections = di instance[method].toString()
-        injections = injections.map (injection) ->
-          if db[injection] then db[injection]
-          else if app.get injection then app.get injection
-          else throw new Error "Can't find the injection #{injection}"
-
-        if req.params[idName] and db[modelName]
-          db[modelName]
-            .find(req.params[idName]).complete (err, result) ->
-              instance["_#{instanceName}"] = result
-              instance[method] injections...
-        else
-          instance[method] injections...
-
-      app[data.verb] url, middlewares
-      console.log data.verb, url
 
 isPromise =(v) ->
   v isnt null && typeof v is 'object' && typeof v.complete is 'function'
@@ -112,13 +71,13 @@ exports.inflection =
   toInstance: (name) ->
     inflection.singularize inflection.camelize name, true
 
-di = (fn) ->
+exports.di = di = (fn) ->
   FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
   FN_ARG_SPLIT = /,/
   FN_ARG = /^\s*(_?)(\S+?)\1\s*$/
   STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
   inject = []
-  fnText = fn.toString().replace STRIP_COMMENTS, ''
+  fnText = fn.replace STRIP_COMMENTS, ''
   argDecl = fnText.match FN_ARGS
   argDecl[1].split(FN_ARG_SPLIT).forEach (arg) ->
     arg.replace FN_ARG, (all, underscore, name) ->

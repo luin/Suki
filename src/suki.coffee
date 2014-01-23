@@ -19,37 +19,39 @@ requireDirectory = (directory) ->
     instance
 
 Suki = (option = {}) ->
+  global.Suki = Suki
   app = express()
   app.use express.bodyParser()
   app.use express.methodOverride()
   appDirectory =
     option.appDirectory or path.dirname module.parent.parent.filename
 
-  controllers =
-    requireDirectory path.join appDirectory, 'app', 'controllers'
-
-  app.set 'controllers', controllers
-
-  for controller in controllers
-    utils.mapControllerToRoute app, controller
-
   sequelize = new Sequelize config.sequelize.database,
     config.sequelize.username,
     config.sequelize.password,
     config.sequelize
 
-  models =
-    requireDirectory path.join appDirectory, 'app', 'models'
+  modelList = requireDirectory(path.join appDirectory, 'app', 'models')
+
+  models = {}
+  for model in modelList
+    model.modelName = utils.inflection.toModel model.moduleName
+    model.model = sequelize.define model.modelName,
+      model.define(Sequelize),
+      model.config
+    models[model.modelName] = model.model
 
   app.set 'models', models
 
-  for model in models
-    model.modelName = utils.inflection.toModel model.moduleName
-    model.model = sequelize.define model.modelName,
-      model.defineProperties(Sequelize),
-      model.defineConfiguration
-
   sequelize.sync()
+
+  controllers =
+    requireDirectory path.join appDirectory, 'app', 'controllers'
+
+  app.set 'controllers', controllers
+  for controller in controllers
+    controller._mapToRoute app
+
   app
 
 

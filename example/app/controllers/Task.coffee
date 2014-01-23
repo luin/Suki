@@ -1,4 +1,10 @@
-module.exports = class extends require('../../..').Controller
+module.exports = class extends Suki.Controller
+  @belongTo: 'User'
+  @beforeAction '_needLogin', only: 'index'
+  # @beforeAction (controller) ->
+  #   controller.name = 1
+  #   controller.next new Error '404'
+  # , only: 'create'
 
   # POST /tasks
   create: (Task) ->
@@ -10,7 +16,7 @@ module.exports = class extends require('../../..').Controller
     @res.json Task.findAll()
 
   # GET /tasks/:id
-  get: ->
+  show: ->
     @res.json @_task
 
   # DELETE /tasks/:id
@@ -18,3 +24,7 @@ module.exports = class extends require('../../..').Controller
     @_task.destroy()
     @res.json { "message": "deleted" }
 
+
+  _needLogin: ->
+    console.log 'needLogin'
+    @next()
