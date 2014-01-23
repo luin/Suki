@@ -1,9 +1,7 @@
-exports.mapControllerToRoute = (app, Controller) ->
-
-isPromise =(v) ->
+isPromise = exports.isPromise =(v) ->
   v isnt null && typeof v is 'object' && typeof v.complete is 'function'
 
-resolveAsync = (object, callback) ->
+resolveAsync = exports.resolveAsync = (object, callback) ->
   unless object and typeof object is 'object'
     return callback null, object
 
@@ -64,9 +62,11 @@ exports.resolvePromise = (req, res, next) ->
 
 inflection = require 'inflection'
 exports.inflection =
-  toRouter: (name) -> inflection.pluralize name.toLowerCase()
-  toModel : (name) -> inflection.singularize inflection.camelize name
-  toId    : (name) ->
+  toRouter: (name) ->
+    inflection.pluralize name.toLowerCase()
+  toModel: (name) ->
+    inflection.singularize inflection.camelize name
+  toId: (name) ->
     "#{inflection.singularize inflection.camelize name, true}Id"
   toInstance: (name) ->
     inflection.singularize inflection.camelize name, true
