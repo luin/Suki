@@ -17,6 +17,7 @@
     "sequelize": "~2.0.0-dev1",
     "config": "~0.4.35",
     "yaml": "~0.2.3",
-    "mysql": "~2.0.1"
+    "mysql": "~2.0.1",
+    "mongoose": "~3.8.4"
   }
 }

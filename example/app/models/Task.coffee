@@ -1,4 +1,4 @@
-module.exports = class extends Suki.Model
+module.exports = class extends Suki.SequelizeModel
   @config:
     tableName: 'tasks'
 

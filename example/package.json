@@ -18,5 +18,8 @@
     "grunt-coffeelint": "0.0.8",
     "should": "~3.0.1",
     "supertest": "~0.9.0"
+  },
+  "dependencies": {
+    "mongoose": "~3.8.4"
   }
 }

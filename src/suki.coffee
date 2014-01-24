@@ -19,40 +19,58 @@ requireDirectory = (directory) ->
     instance
 
 Suki = (option = {}) ->
+  # Make `Suki` as a global var
   global.Suki = Suki
   app = express()
-  app.use express.bodyParser()
-  app.use express.methodOverride()
+
+  unless option.skipUse
+    app.use express.bodyParser()
+    app.use express.methodOverride()
+
   appDirectory =
     option.appDirectory or path.dirname module.parent.parent.filename
 
-  sequelize = new Sequelize config.sequelize.database,
-    config.sequelize.username,
-    config.sequelize.password,
-    config.sequelize
-
-  modelList = requireDirectory(path.join appDirectory, 'app', 'models')
-
-  models = {}
-  for model in modelList
-    model._initModel Sequelize, sequelize
-    models[model.modelName] = model.model
-
-  app.set 'models', models
-
-  sequelize.sync()
-
+  # Load controllers
   controllers =
     requireDirectory path.join appDirectory, 'app', 'controllers'
 
   for controller in controllers
     controller._mapToRoute app, option
 
+  if config.sequelize
+    # Connect to Database via sequelize
+    sequelize = new Sequelize config.sequelize.database,
+      config.sequelize.username,
+      config.sequelize.password,
+      config.sequelize
+
+    # Sync Database
+    if config.sequelize.sync
+      sequelize.sync()
+
+  if config.mongoose
+    'pass'
+
+  # Load models
+  models =
+    requireDirectory(path.join appDirectory, 'app', 'models')
+
+  for model in models
+    if model._type is 'Sequelize'
+      throw new Error 'Missing config for sequelize' unless sequelize
+      model._initModel Sequelize, sequelize
+
+    else if model._type is 'Mongoose'
+      throw new Error 'Missing config for mongoose' unless mongoose
+      model._initModel Sequelize, mongoose
+
+    app.set model.modelName, model.model
+
   app
 
-
 Suki.Controller = require './Controller'
-Suki.Model = require './Model'
+Suki.SequelizeModel = require './SequelizeModel'
+Suki.MongooseModel = require './MongooseModel'
 
 module.exports = Suki
 

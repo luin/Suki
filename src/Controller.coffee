@@ -60,10 +60,13 @@ module.exports = Controller = class
     injectionsCache = {}
     getInjections = (fn) ->
       fn = fn.toString()
-      return injectionsCache[fn] if injectionsCache[fn]
-      injectionsCache[fn] = utils.di(fn).map (injection) ->
-        if models[injection] then models[injection]
-        else if app.get injection then app.get injection
+      injections =
+        if injectionsCache[fn]
+          injectionsCache[fn]
+        else
+          injectionsCache[fn] = utils.di(fn)
+      injections.map (injection) ->
+        if app.get injection then app.get injection
         else throw new Error "Can't find the injection #{injection}"
 
     for own method, data of @.supportMethods
