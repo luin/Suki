@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/reset.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/animate.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/style.css" media="screen" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="highlight/styles/zenburn.css">
+    <script src="highlight/highlight.pack.js"></script>
+    <title>Get started - Suki</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="doc">
+        <p class="back"><a href="index.html">&lt; Back</a></p>
+        <h1>入门</h1>
+        <h2>用 2 分钟建立一个 RESTful API 服务</h2>
+        <hr>
+        <h3>0. 目标</h3>
+        <p>在本篇教程中，我们要使用 Suki 建立一个提供任务管理接口的 RESTful API，通过这个 API，我们可以创建任务、删除任务、标记任务为已完成以及获取所有任务。</p>
+        <h3>1. 安装 Suki</h3>
+        <p>Suki is bundled with an executable, aptly named suki(1). If you install suki globally with npm you'll have it available from anywhere on your machine:</p>
+        <pre><code>$ npm install -g suki</code></pre>
+        <h3>2. Create a application</h3>
+        <p>A good beginning is half done. Suki can create a template application for you:</p>
+        <pre><code>$ suki init task</code></pre>
+        <p>Where "task" is the name of your application.</p>
+        <p>After execute the init command, Suki will create a "task" directory in the current path.</p>
+        <h3>3. Define the model</h3>
+        <p>A typical Suki application is consisting of two parts. One is controllers, and the other is models. Controllers is related to the router, which we will see later in this tutorial. Models is where we defined our</p>
+        <pre><code>$ suki create-model task</code></pre>
+        <h3>4. Define the controller</h3>
+        <pre><code>$ suki create-controller task</code></pre>
+        <pre><code>module.exports = class extends require('suki').Controller
+
+  # POST /tasks
+  create: ->
+    task = @db.Task.create { title: @req.body.title }
+    @res.json task
+
+  # GET /tasks
+  index: ->
+    @res.json @db.Task.findAll()
+
+  # GET /tasks/:id
+  get: ->
+    @res.json @_task
+
+  # DELETE /tasks/:id
+  destroy: ->
+    @_task.destroy()
+    @res.json { "message": "deleted" }
+        </code></pre>
+      </div>
+    </header>
+    <a href="https://github.com/luin/Suki"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub"></a>
+    <script src="javascripts/jquery.js"></script>
+    <script src="javascripts/main.js"></script>
+  </body>
+</html>
+

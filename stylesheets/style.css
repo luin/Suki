@@ -1,0 +1,122 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  color: #333;
+}
+
+h1 {
+  font-size: 60px;
+  font-weight: 800;
+  text-align: center;
+}
+
+h2 {
+  font-size: 30px;
+  font-weight: 300;
+  text-align: center;
+  color: #CCC;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+  color: #333;
+}
+
+.introduction {
+  margin: 150px auto;
+  width: 860px;
+}
+
+button {
+  border: none;
+  color: #FFF;
+  background-color: #c93a3a;
+  cursor: pointer;
+}
+
+.button {
+  margin: 80px auto;
+  width: 400px;
+}
+
+.button a {
+  color: #FFF;
+  text-decoration: none;
+}
+
+.begin-btn, .doc-btn {
+  float: left;
+  width: 170px;
+}
+
+.button .or {
+  float: left;
+  font-style: italic;
+  margin-top: 10px;
+  width: 60px;
+  text-align: center;
+  color: #CCC;
+}
+
+button .title {
+  margin: 5px 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+button .description {
+  margin: 5px 0;
+  font-size: 14px;
+  text-align: center;
+  color: #f6cbcb;
+}
+
+.doc {
+  width: 700px;
+  margin: 120px auto;
+}
+
+.doc h1 {
+  text-align: left;
+}
+
+.doc h2 {
+  text-align: left;
+}
+
+.doc h3 {
+  margin-top: 50px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.doc p {
+  margin: 20px 0;
+  color: #666;
+  line-height: 1.5em;
+  padding-left: 20px;
+}
+
+.back a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+hr {
+  border: none;
+  margin: 40px 0;
+  border-bottom: 1px dashed #EEE;
+}
+
+.doc pre {
+  margin: 10px 0;
+}
+
+.doc code {
+  margin-left: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  padding-left: 10px;
+}
