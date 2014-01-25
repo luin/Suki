@@ -1,7 +1,7 @@
 utils = require './utils'
 
 module.exports = Controller = class
-  @supportMethods =
+  supportMethods =
     index:
       verb: 'get'
       url: '/{{module}}'
@@ -27,6 +27,14 @@ module.exports = Controller = class
       verb: 'delete'
       url: '/{{module}}/{{id}}'
 
+  @initialize: ->
+    Object.defineProperty @, 'supportMethods',
+      get: ->
+        unless @_supportMethods
+          @_supportMethods = utils.clone supportMethods
+        @_supportMethods
+    @
+
   @beforeAction: (action, condition) ->
     # Calc condition
     targetMethods =
@@ -47,6 +55,9 @@ module.exports = Controller = class
         Object.keys @supportMethods
 
     for method in targetMethods
+      unless @supportMethods[method]
+        throw new Error "Unsupported action name `#{method}`"
+
       unless @supportMethods[method].beforeActions
         @supportMethods[method].beforeActions = []
 
@@ -69,14 +80,14 @@ module.exports = Controller = class
         if app.get injection then app.get injection
         else throw new Error "Can't find the injection #{injection}"
 
-    for own method, data of @.supportMethods
+    for own method, data of @supportMethods
       do (method, data) =>
-        return unless @.prototype[method]
+        return unless @prototype[method]
 
-        routerName = utils.inflection.toRouter @.moduleName
-        idName     = utils.inflection.toId @.moduleName
-        modelName  = utils.inflection.toModel @.moduleName
-        instanceName  = utils.inflection.toInstance @.moduleName
+        routerName = utils.inflection.toRouter @moduleName
+        idName     = utils.inflection.toId @moduleName
+        modelName  = utils.inflection.toModel @moduleName
+        instanceName  = utils.inflection.toInstance @moduleName
         url = data.url
           .replace('{{module}}', routerName)
           .replace('{{id}}', ":#{idName}")
@@ -112,5 +123,4 @@ module.exports = Controller = class
             instance[method] getInjections(instance[method])...
 
         app[data.verb] url, middlewares
-        console.log data.verb, url
 

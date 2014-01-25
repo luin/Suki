@@ -20,7 +20,6 @@ requireDirectory = (directory) ->
 
 Suki = (option = {}) ->
   # Make `Suki` as a global var
-  global.Suki = Suki
   app = express()
 
   unless option.skipUse
@@ -35,6 +34,7 @@ Suki = (option = {}) ->
     requireDirectory path.join appDirectory, 'app', 'controllers'
 
   for controller in controllers
+    controller.initialize()
     controller._mapToRoute app, option
 
   if config.sequelize
@@ -72,5 +72,4 @@ Suki.Controller = require './Controller'
 Suki.SequelizeModel = require './SequelizeModel'
 Suki.MongooseModel = require './MongooseModel'
 
-module.exports = Suki
-
+global.Suki = module.exports = Suki
