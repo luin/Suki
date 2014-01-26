@@ -20,7 +20,8 @@ Suki = (option = {}) ->
   app = express()
 
   unless option.skipUse
-    app.use express.bodyParser()
+    app.use express.json()
+    app.use express.urlencoded()
     app.use express.methodOverride()
 
   appDirectory =
