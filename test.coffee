@@ -3,7 +3,12 @@ fs    = require "fs"
 path  = require "path"
 should = require 'should'
 
-mocha = new Mocha
+option =
+  reporter: 'spec'
+  compilers: 'coffee:coffee-script'
+
+
+mocha = new Mocha option
 
 dir = "./test"
 isCoffee = (file) -> /\.((lit)?coffee|coffee\.md)$/.test(file)

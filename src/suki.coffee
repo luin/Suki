@@ -12,7 +12,11 @@ requireDirectory = (directory) ->
     '.coffee' is path.extname name
   files = files.map    (name) ->
     instance = require path.join directory, name
-    instance.moduleName = path.basename name.toLowerCase(), path.extname name
+    instance.moduleName    = path.basename name.toLowerCase(), path.extname name
+    instance.routerName    = utils.inflection.toRouter instance.moduleName
+    instance.idName        = utils.inflection.toId instance.moduleName
+    instance.modelName     = utils.inflection.toModel instance.moduleName
+    instance.instanceName  = utils.inflection.toInstance instance.moduleName
     instance
 
 Suki = (option = {}) ->
@@ -32,7 +36,6 @@ Suki = (option = {}) ->
     requireDirectory path.join appDirectory, 'app', 'controllers'
 
   for controller in controllers
-    controller.initialize()
     controller._mapToRoute app, option
 
   if config.sequelize
@@ -41,10 +44,6 @@ Suki = (option = {}) ->
       config.sequelize.username,
       config.sequelize.password,
       config.sequelize
-
-    # Sync Database
-    if config.sequelize.sync
-      sequelize.sync()
 
   if config.mongoose
     'pass'
@@ -62,6 +61,11 @@ Suki = (option = {}) ->
 
   # Init associations for Sequelize
   for model in models then model._initAssociations?()
+
+  # Sync Database
+  if config.sequelize?.sync
+    sequelize.sync()
+
   app
 
 Suki.Controller = require './Controller'
