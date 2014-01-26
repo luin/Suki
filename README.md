@@ -74,42 +74,46 @@ Now let's define the book model. We can create the book model using the followin
 
 `$ suki generate model book`
 
-    module.exports = class extends Suki.SequelizeModel
+```CoffeeScript
+module.exports = class extends Suki.SequelizeModel
 
-      @_define: (DataTypes) ->
-        title: DataTypes.STRING
-        price: DataTypes.INTEGER
+  @_define: (DataTypes) ->
+    title: DataTypes.STRING
+    price: DataTypes.INTEGER
+```
 
 ### 4. Define the controller
 
 `$ suki create-controller task`
 
-    module.exports = class extends Suki.Controller
+```CoffeeScript
+module.exports = class extends Suki.Controller
 
-      # GET /books
-      index: (Book) ->
-        @res.json Book.findAll()
+  # GET /books
+  index: (Book) ->
+    @res.json Book.findAll()
 
-      # POST /books
-      create: (Book) ->
-        @res.json Book.create
-          title: @req.body.title
-          price: @req.body.price
+  # POST /books
+  create: (Book) ->
+    @res.json Book.create
+      title: @req.body.title
+      price: @req.body.price
 
-      # GET /books/:bookId
-      show: ->
-        @res.json @book
+  # GET /books/:bookId
+  show: ->
+    @res.json @book
 
-      # PUT /books/:id
-      update: ->
-        @book.title = req.body.title
-        @book.price = req.body.price
-        @res.json @book.save()
+  # PUT /books/:id
+  update: ->
+    @book.title = req.body.title
+    @book.price = req.body.price
+    @res.json @book.save()
 
-      # DELETE /books/:id
-      destroy: ->
-        @book.destroy()
-        @res.json { "message": "deleted" }
+  # DELETE /books/:id
+  destroy: ->
+    @book.destroy()
+    @res.json { "message": "deleted" }
+```
 
 License
 -------
