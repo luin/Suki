@@ -99,6 +99,39 @@ button .description {
   padding-left: 20px;
 }
 
+.doc .content {
+  margin: 20px 0 20px 20px;
+}
+
+.doc table {
+  color: #666;
+  line-height: 1.5em;
+  width: 100%;
+}
+
+.doc tr {
+  border: 1px solid #ccc;
+}
+
+.doc thead tr {
+  border: 1px solid #3f3f3f;
+}
+
+.doc tr:nth-child(odd) {
+  background-color: #EEE;
+}
+
+.doc th,
+.doc td {
+  padding: 8px 20px;
+}
+
+.doc th {
+  font-weight: 600;
+  color: #dcdcdc;
+  background-color: #3f3f3f;
+}
+
 .back a {
   color: #ccc;
   text-decoration: none;
@@ -107,7 +140,7 @@ button .description {
 hr {
   border: none;
   margin: 40px 0;
-  border-bottom: 1px dashed #EEE;
+  border-bottom: 1px dashed #eee;
 }
 
 .doc pre {
@@ -119,4 +152,17 @@ hr {
   padding: 10px;
   border-radius: 5px;
   padding-left: 10px;
+}
+
+.doc code.inline {
+  margin: 0;
+  /* background-color: #3f3f3f; */
+  border-bottom: 1px dotted #3f3f3f;
+  border-radius: 0;
+  color: #3f3f3f;
+  padding: 3px 5px;
+}
+
+.doc .preface {
+  padding-left: 0;
 }

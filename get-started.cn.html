@@ -22,43 +22,108 @@
       <div class="doc">
         <p class="back"><a href="index.html">&lt; Back</a></p>
         <h1>入门</h1>
-        <h2>用 2 分钟建立一个 RESTful API 服务</h2>
+        <h2>5 分钟开发一个 RESTful API</h2>
         <hr>
-        <h3>0. 目标</h3>
-        <p>在本篇教程中，我们要使用 Suki 建立一个提供任务管理接口的 RESTful API，通过这个 API，我们可以创建任务、删除任务、标记任务为已完成以及获取所有任务。</p>
+        <p class="preface">在本篇教程中，我们将学会如何使用 Suki 框架开发一个 RESTful API 应用。</p>
+        <h3>0. 定义 API</h3>
+        <p>这个 API 提供了图书管理接口，具体如下：</p>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>方法</th>
+                <th>URL</th>
+                <th>描述</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GET</td>
+                <td>/books</td>
+                <td>获取所有的书</td>
+              </tr>
+              <tr>
+                <td>POST</td>
+                <td>/books</td>
+                <td>创建一本书</td>
+              </tr>
+              <tr>
+                <td>GET</td>
+                <td>/books/:bookId</td>
+                <td>获取指定的书</td>
+              </tr>
+              <tr>
+                <td>PUT</td>
+                <td>/books/:bookId</td>
+                <td>修改指定的书</td>
+              </tr>
+              <tr>
+                <td>DELETE</td>
+                <td>/books/:bookId</td>
+                <td>删除指定的书</td>
+              </tr>
+          </table>
+        </div>
         <h3>1. 安装 Suki</h3>
-        <p>Suki is bundled with an executable, aptly named suki(1). If you install suki globally with npm you'll have it available from anywhere on your machine:</p>
+        <p>Suki 框架提供了一个实用的命令 <code class="inline">suki</code>，使用如下命令安装，就可以在任何地方调用这个命令了：</p>
         <pre><code>$ npm install -g suki</code></pre>
-        <h3>2. Create a application</h3>
-        <p>A good beginning is half done. Suki can create a template application for you:</p>
-        <pre><code>$ suki init task</code></pre>
-        <p>Where "task" is the name of your application.</p>
-        <p>After execute the init command, Suki will create a "task" directory in the current path.</p>
-        <h3>3. Define the model</h3>
-        <p>A typical Suki application is consisting of two parts. One is controllers, and the other is models. Controllers is related to the router, which we will see later in this tutorial. Models is where we defined our</p>
-        <pre><code>$ suki create-model task</code></pre>
-        <h3>4. Define the controller</h3>
-        <pre><code>$ suki create-controller task</code></pre>
-        <pre><code>module.exports = class extends require('suki').Controller
+        <h3>2. 创建一个应用</h3>
+        <p>我们要做的第一件事就是创建一个 Suki 应用，使用 <code class="inline">suki new</code> 命令可以轻松创建一个应用模板：</p>
+        <pre><code>$ suki new book</code></pre>
+        <p>其中 <code class="inline">book</code> 是应用的名称。</p>
+        <p>命令执行后，Suki 会在当前目录中建立一个名为 "book" 的目录，这就是我们应用的根目录。</p>
+        <h3>3. 定义模型（Model）</h3>
+        <p>Suki 遵循 MVC 模式，并使用 <a href="http://sequelizejs.com">Sequelize</a> 库作为模型层</p>
+        <p>现在我们执行以下命令建立一个 book 模型：</p>
+        <pre><code>$ suki generate model book</code></pre>
+        <p>该命令会在应用根目录下的 app/models 文件夹下建立名为 Book.coffee 的文件，内容如下：</p>
+        <pre><code>module.exports = class extends Suki.SequelizeModel
 
-  # POST /tasks
-  create: ->
-    task = @db.Task.create { title: @req.body.title }
-    @res.json task
-
-  # GET /tasks
-  index: ->
-    @res.json @db.Task.findAll()
-
-  # GET /tasks/:id
-  get: ->
-    @res.json @_task
-
-  # DELETE /tasks/:id
-  destroy: ->
-    @_task.destroy()
-    @res.json { "message": "deleted" }
+  @_define: (DataTypes) ->
         </code></pre>
+        <p>我们为 book 模型定义两个属性，分别为标题（title）和价格（price）：</p>
+        <pre><code>module.exports = class extends Suki.SequelizeModel
+
+  @_define: (DataTypes) ->
+    title: DataTypes.STRING
+    price: DataTypes.INTEGER
+        </code></pre>
+        <h3>4. 定义控制器（Controller）</h3>
+        <p>控制器和路由相关。</p>
+        <p>执行如下命令建立一个 book 控制器：</p>
+        <pre><code>$ suki generate controller book</code></pre>
+        <p>该命令会在应用根目录下的 app/controllers 文件夹下建立名为 Book.coffee 的文件，我们将其内容修改为：</p>
+        <pre><code>module.exports = class extends Suki.Controller
+
+  # GET /books
+  index: (Book) ->
+    @res.json Book.findAll()
+
+  # POST /books
+  create: (Book) ->
+    @res.json Book.create
+      title: @req.body.title
+      price: @req.body.price
+
+  # GET /books/:bookId
+  show: ->
+    @res.json @book
+
+  # PUT /books/:id
+  update: ->
+    @book.title = req.body.title
+    @book.price = req.body.price
+    @res.json @book.save()
+
+  # DELETE /books/:id
+  destroy: ->
+    @book.destroy()
+    @res.json { "message": "deleted" }
+
+        </code></pre>
+        <p>在 Suki 中，每个控制器都是一个 CoffeeScript 中的 class。每当访问一个 URL 时，Suki 会根据规则找到其对应的控制器，并调用控制器中相应的方法。</p>
+        <h3>5. 配置数据库连接</h3>
+        <p>将应用根目录下的 config/default.yml 中的 sequelize 修改实际的情况。</p>
       </div>
     </header>
     <a href="https://github.com/luin/Suki"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub"></a>
@@ -66,4 +131,5 @@
     <script src="javascripts/main.js"></script>
   </body>
 </html>
+
 

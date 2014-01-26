@@ -24,19 +24,59 @@
         <h1>Get started</h1>
         <h2>Build a RESTful API within 2 minutes</h2>
         <hr>
-        <h3>0. What We’ll Be Building</h3>
-        <p>In this tutorial, we will use Suki to build a RESTful API. This will allow us to have an api that will get all tasks, create a task, and complete and delete a task. It will return all this information in JSON format.</p>
+        <p>In this tutorial, we will explain how to create a simple application that provides a RESTful API using the Suki framework.</p>
+        <h3>0. Defining the API</h3>
+        <p>We will build an API to manage books. The API consists of the following methods:</p>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>URL</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GET</td>
+                <td>/books</td>
+                <td>Retrieves all books</td>
+              </tr>
+              <tr>
+                <td>POST</td>
+                <td>/books</td>
+                <td>Create a new book</td>
+              </tr>
+              <tr>
+                <td>GET</td>
+                <td>/books/:bookId</td>
+                <td>Retrieves a specific book</td>
+              </tr>
+              <tr>
+                <td>PUT</td>
+                <td>/books/:bookId</td>
+                <td>Updates a specific book</td>
+              </tr>
+              <tr>
+                <td>DELETE</td>
+                <td>/books/:bookId</td>
+                <td>Deletes a specific book</td>
+              </tr>
+          </table>
+        </div>
         <h3>1. Install Suki</h3>
-        <p>Suki is bundled with an executable, aptly named suki(1). If you install suki globally with npm you'll have it available from anywhere on your machine:</p>
+        <p>Suki is bundled with an executable. If you install suki globally with npm you'll have it available from anywhere on your machine:</p>
         <pre><code>$ npm install -g suki</code></pre>
         <h3>2. Create a application</h3>
         <p>A good beginning is half done. Suki can create a template application for you:</p>
-        <pre><code>$ suki init task</code></pre>
-        <p>Where "task" is the name of your application.</p>
-        <p>After execute the init command, Suki will create a "task" directory in the current path.</p>
+        <pre><code>$ suki new book</code></pre>
+        <p>Where <code class="inline">book</code> is the name of your application.</p>
+        <p>After execute the command, Suki will create a directory named "book" in the current path.</p>
         <h3>3. Define the model</h3>
-        <p>A typical Suki application is consisting of two parts. One is controllers, and the other is models. Controllers is related to the router, which we will see later in this tutorial. Models is where we defined our</p>
-        <pre><code>$ suki create-model task</code></pre>
+        <p>Suki follows the MVC pattern and use the <a href="http://sequelizejs.com">Sequelize</a> library as the model layer.</p>
+        <p>Now let's define the book model. We can create the book model using the following command:</p>
+        <pre><code>$ suki generate model book</code></pre>
+        <p>And 
         <h3>4. Define the controller</h3>
         <pre><code>$ suki create-controller task</code></pre>
         <pre><code>module.exports = class extends require('suki').Controller
