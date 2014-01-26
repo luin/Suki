@@ -71,6 +71,9 @@ exports.inflection =
   toInstance: (name) ->
     inflection.singularize inflection.camelize name, true
 
+exports.capitalize = (word) ->
+  word.charAt(0).toUpperCase() + word.slice 1
+
 exports.di = (fn) ->
   FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
   FN_ARG_SPLIT = /,/
@@ -92,4 +95,7 @@ clone = exports.clone = (obj) ->
     temp[key] = clone(obj[key])
 
   temp
+
+exports.splitByCapital = (word) ->
+  inflection.underscore(word).split '_'
 
