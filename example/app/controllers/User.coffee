@@ -14,11 +14,15 @@ module.exports = class extends Suki.Controller
     @res.json @user.getTasks()
 
   showTask: (Task) ->
+    @res.json
+      name: @task.name()
+
+  loadTask: (Task) ->
+    console.log '======LOAD'
     Task.find
       where:
         id: @req.params.taskId
     .complete (err, task) =>
-      name = task.name()
-      @res.json
-        name: name
+      @task = task
+      @next()
 
