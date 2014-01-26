@@ -11,6 +11,8 @@ module.exports = Controller = class
           unless err
             @[klass.instanceName] = result
           @next err
+    else
+      @next()
 
   @supportActions =
     index:
@@ -116,19 +118,25 @@ module.exports = Controller = class
 
         # Auto load
         currentLoadActionName = ''
+        needLoad = ~@supportActions[resources.action].url.indexOf '{{id}}'
         for resource, index in resources
-          if resource is @ and @prototype.load
-            middlewares.push (req, res, next) ->
-              instance = req.__suki_controller_instance
-              instance.next = next
-              instance.load getInjections(instance.load)...
-          else
-            currentLoadActionName += utils.capitalize resource
-            if @prototype["load#{currentLoadActionName}"]
+          isntLastResouce = index isnt resources.length - 1
+          if resource is @
+            if @prototype.load and (isntLastResouce or needLoad)
               middlewares.push (req, res, next) ->
                 instance = req.__suki_controller_instance
                 instance.next = next
                 instance.load getInjections(instance.load)...
+          else
+            currentLoadActionName += utils.capitalize resource
+            if @prototype["load#{currentLoadActionName}"] and
+                (isntLastResouce or needLoad)
+              middlewares.push (req, res, next) ->
+                instance = req.__suki_controller_instance
+                instance.next = next
+                instance["load#{currentLoadActionName}"](
+                  getInjections(instance["load#{currentLoadActionName}"])...
+                )
 
         # Apply beforeAction
         if @_beforeActions
@@ -156,5 +164,4 @@ module.exports = Controller = class
 
         method = @supportActions[resources.action].method
         app[method] @baseURL + resources.url, middlewares
-        console.log method, @baseURL + resources.url, middlewares
 
