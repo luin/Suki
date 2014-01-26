@@ -23,25 +23,25 @@ module.exports = class
 
   @_initAssociations: ->
     ['hasOne', 'hasMany', 'belongsTo'].forEach (name) =>
-      if @["__#{name}"]
-        for item in @["__#{name}"]
+      if @["_#{name}"]
+        for item in @["_#{name}"]
           model = @models[item.modelName]
           @model[name] model, item.option
 
-  @_hasOne: (modelName, option) ->
-    @__hasOne = [] unless @__hasOne
-    @__hasOne.push
+  @hasOne: (modelName, option) ->
+    @_hasOne = [] unless @__hasOne
+    @_hasOne.push
       modelName: modelName
       option: option
 
-  @_hasMany: (modelName, option) ->
-    @__hasMany = [] unless @__hasMany
-    @__hasMany.push
+  @hasMany: (modelName, option) ->
+    @_hasMany = [] unless @__hasMany
+    @_hasMany.push
       modelName: modelName
       option: option
 
-  @_belongsTo: (modelName, option) ->
-    @__belongsTo = [] unless @__belongsTo
-    @__belongsTo.push
+  @belongsTo: (modelName, option) ->
+    @_belongsTo = [] unless @__belongsTo
+    @_belongsTo.push
       modelName: modelName
       option: option
