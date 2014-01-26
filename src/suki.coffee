@@ -1,13 +1,10 @@
 express = require 'express'
 path    = require 'path'
 fs      = require 'fs'
-
-Sequelize  = require 'sequelize'
-
 utils   = require './utils'
-
 config  = require 'config'
 
+Sequelize  = require 'sequelize'
 
 requireDirectory = (directory) ->
   files = fs.readdirSync directory
@@ -60,16 +57,11 @@ Suki = (option = {}) ->
       throw new Error 'Missing config for sequelize' unless sequelize
       model._initModel Sequelize, sequelize
 
-    else if model._type is 'Mongoose'
-      throw new Error 'Missing config for mongoose' unless mongoose
-      model._initModel Sequelize, mongoose
-
     app.set model.modelName, model.model
 
   app
 
 Suki.Controller = require './Controller'
 Suki.SequelizeModel = require './SequelizeModel'
-Suki.MongooseModel = require './MongooseModel'
 
 global.Suki = module.exports = Suki
