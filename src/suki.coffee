@@ -45,9 +45,6 @@ Suki = (option = {}) ->
       config.sequelize.password,
       config.sequelize
 
-  if config.mongoose
-    'pass'
-
   # Load models
   models =
     requireDirectory(path.join appDirectory, 'app', 'models')
