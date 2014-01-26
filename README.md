@@ -1,6 +1,6 @@
 # WORK IN PROGRESS ☞ [![Build Status](https://travis-ci.org/luin/Suki.png?branch=master)](https://travis-ci.org/luin/Suki) ლ(´ڡ`ლ)
 
-However, there is a working example in the `example` folder
+However, there is a working example in the `example` folder.
 
 * * *
 
@@ -10,7 +10,7 @@ However, there is a working example in the `example` folder
 
 In this tutorial, we will explain how to create a simple application that provides a RESTful API using the Suki framework.
 
-### 0. Defining the API
+### 0. Define the API
 
 We will build an API to manage books. The API consists of the following methods:
 
