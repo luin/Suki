@@ -1,6 +1,6 @@
 # WORK IN PROGRESS
 
-However, there is a WORKING example in the `example` folder
+However, there is a working example in the `example` folder
 
 * * *
 
@@ -76,9 +76,9 @@ Now let's define the book model. We can create the book model using the followin
 
     module.exports = class extends Suki.SequelizeModel
 
-    @_define: (DataTypes) ->
-      title: DataTypes.STRING
-      price: DataTypes.INTEGER
+      @_define: (DataTypes) ->
+        title: DataTypes.STRING
+        price: DataTypes.INTEGER
 
 ### 4. Define the controller
 
@@ -86,30 +86,30 @@ Now let's define the book model. We can create the book model using the followin
 
     module.exports = class extends Suki.Controller
 
-    # GET /books
-    index: (Book) ->
-      @res.json Book.findAll()
+      # GET /books
+      index: (Book) ->
+        @res.json Book.findAll()
 
-    # POST /books
-    create: (Book) ->
-      @res.json Book.create
-        title: @req.body.title
-        price: @req.body.price
+      # POST /books
+      create: (Book) ->
+        @res.json Book.create
+          title: @req.body.title
+          price: @req.body.price
 
-    # GET /books/:bookId
-    show: ->
-      @res.json @book
+      # GET /books/:bookId
+      show: ->
+        @res.json @book
 
-    # PUT /books/:id
-    update: ->
-      @book.title = req.body.title
-      @book.price = req.body.price
-      @res.json @book.save()
+      # PUT /books/:id
+      update: ->
+        @book.title = req.body.title
+        @book.price = req.body.price
+        @res.json @book.save()
 
-    # DELETE /books/:id
-    destroy: ->
-      @book.destroy()
-      @res.json { "message": "deleted" }
+      # DELETE /books/:id
+      destroy: ->
+        @book.destroy()
+        @res.json { "message": "deleted" }
 
 License
 -------
