@@ -4,4 +4,5 @@ sequelize:
   database: suki
   username: root
   password: ""
+  sync: true
 
