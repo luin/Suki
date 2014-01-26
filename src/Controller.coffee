@@ -1,72 +1,58 @@
 utils = require './utils'
 
 module.exports = Controller = class
-  supportMethods =
+  @baseURL = ''
+
+  load: ->
+    klass = @constructor
+    if @req.params[klass.idName] and @req.app.get klass.modelName
+      @req.app.get(klass.modelName)
+        .find(@req.params[klass.idName]).complete (err, result) =>
+          unless err
+            @[klass.instanceName] = result
+          @next err
+
+  @supportActions =
     index:
-      verb: 'get'
+      method: 'get'
       url: '/{{module}}'
     new:
-      verb: 'get'
+      method: 'get'
       url: '/{{module}}/new'
     create:
-      verb: 'post'
+      method: 'post'
       url: '/{{module}}'
     show:
-      verb: 'get'
+      method: 'get'
       url: '/{{module}}/{{id}}'
     edit:
-      verb: 'get'
+      method: 'get'
       url: '/{{module}}/edit'
     update:
-      verb: 'put'
+      method: 'put'
       url: '/{{module}}/{{id}}'
     patch:
-      verb: 'patch'
+      method: 'patch'
       url: '/{{module}}/{{id}}'
     destroy:
-      verb: 'delete'
+      method: 'delete'
       url: '/{{module}}/{{id}}'
 
-  @initialize: ->
-    Object.defineProperty @, 'supportMethods',
-      get: ->
-        unless @_supportMethods
-          @_supportMethods = utils.clone supportMethods
-        @_supportMethods
-    @
+  @before: (action, condition) ->
+    unless @_beforeActions
+      @_beforeActions = []
 
-  @beforeAction: (action, condition) ->
-    # Calc condition
-    targetMethods =
-      if condition
-        if condition.only and condition.except
-          throw new Error 'Cannot use `only` and `except` at the same time.'
+    if condition
+      if typeof condition.only is 'string'
+        condition.only = [condition.only]
+      if typeof condition.except is 'string'
+        condition.except = [condition.except]
 
-        if condition.only
-          if typeof condition.only is 'string'
-            condition.only = [condition.only]
-          condition.only
-        else if condition.except
-          if typeof condition.except is 'string'
-            condition.except = [condition.except]
-          Object.keys(@supportMethods).filter (item) ->
-            -1 is condition.except.indexOf item
-      else
-        Object.keys @supportMethods
-
-    for method in targetMethods
-      unless @supportMethods[method]
-        throw new Error "Unsupported action name `#{method}`"
-
-      unless @supportMethods[method].beforeActions
-        @supportMethods[method].beforeActions = []
-
-      @supportMethods[method].beforeActions.push action
+    @_beforeActions.push
+      action: action
+      condition: condition
 
   @_mapToRoute: (app, option) ->
-    # Get models
-    models = app.get 'models'
-
     # define getInjections
     injectionsCache = {}
     getInjections = (fn) ->
@@ -80,47 +66,95 @@ module.exports = Controller = class
         if app.get injection then app.get injection
         else throw new Error "Can't find the injection #{injection}"
 
-    for own method, data of @supportMethods
-      do (method, data) =>
-        return unless @prototype[method]
+    for own action, body of @prototype
+      do (action, body) =>
+        return unless typeof body is 'function'
+        splitedAction = utils.splitByCapital action
+        actionList = Object.keys @supportActions
+        return unless actionList.some (actionPrefix) ->
+          actionPrefix is splitedAction[0]
 
-        routerName = utils.inflection.toRouter @moduleName
-        idName     = utils.inflection.toId @moduleName
-        modelName  = utils.inflection.toModel @moduleName
-        instanceName  = utils.inflection.toInstance @moduleName
-        url = data.url
-          .replace('{{module}}', routerName)
-          .replace('{{id}}', ":#{idName}")
+        resources = []
+        for item, index in splitedAction
+          if index is 0
+            resources.push @
+            resources.action = item
+          else
+            resources.push item
 
-        unless option.resolvePromise is false
-          middlewares = [utils.resolvePromise]
+        resources.url = ''
+        for resource, index in resources
+          routerName =
+            if resource is @ then @routerName
+            else utils.inflection.toRouter resource
+          idName =
+            if resource is @ then @idName
+            else utils.inflection.toId resource
+          baseAction =
+            if index is resources.length - 1 then resources.action
+            else 'show'
+          definition = @supportActions[baseAction]
 
-        # Store instance to `req`
+          resources.url += definition.url
+            .replace('{{module}}', routerName)
+            .replace('{{id}}', ":#{idName}")
+
+        # We got definition.verb url
+        middlewares =
+          if option.resolvePromise is false then []
+          else [utils.resolvePromise]
+
+        # Store the controller instance in the `req`
         middlewares.push (req, res, next) =>
-          instance = new @()
+          instance = new @
           instance.req = req
+          instance.req.controller = @modelName
+          instance.req.action = action
           instance.res = res
           req.__suki_controller_instance = instance
           next()
 
-        # Apply beforeAction
-        if data.beforeActions
-          data.beforeActions.forEach (action) ->
+        # Auto load
+        currentLoadActionName = ''
+        for resource, index in resources
+          if resource is @ and @prototype.load
             middlewares.push (req, res, next) ->
               instance = req.__suki_controller_instance
               instance.next = next
-              instance[action] getInjections(instance[action])...
+              instance.load getInjections(instance.load)...
+          else
+            currentLoadActionName += utils.capitalize resource
+            if @prototype["load#{currentLoadActionName}"]
+              middlewares.push (req, res, next) ->
+                instance = req.__suki_controller_instance
+                instance.next = next
+                instance.load getInjections(instance.load)...
+
+        # Apply beforeAction
+        if @_beforeActions
+          @_beforeActions.forEach (beforeAction) ->
+            if beforeAction.condition
+              if beforeAction.only
+                return unless ~beforeAction.only.indexOf action
+              else if beforeAction.except
+                return unless beforeAction.except.indexOf action
+
+            if typeof beforeAction.action is 'string'
+              middlewares.push (req, res, next) ->
+                instance = req.__suki_controller_instance
+                instance.next = next
+                instance[beforeAction.action](
+                  getInjections(beforeAction.action[action])...
+                )
+            else if typeof beforeAction.action is 'function'
+              middlewares.push beforeAction.action
 
         middlewares.push (req, res, next) ->
           instance = req.__suki_controller_instance
           instance.next = next
-          if req.params[idName] and models[modelName]
-            models[modelName]
-              .find(req.params[idName]).complete (err, result) ->
-                instance[instanceName] = result
-                instance[method] getInjections(instance[method])...
-          else
-            instance[method] getInjections(instance[method])...
+          instance[action] getInjections(instance[action])...
 
-        app[data.verb] url, middlewares
+        method = @supportActions[resources.action].method
+        app[method] @baseURL + resources.url, middlewares
+        console.log method, @baseURL + resources.url, middlewares
 
