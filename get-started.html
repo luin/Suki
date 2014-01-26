@@ -76,28 +76,41 @@
         <p>Suki follows the MVC pattern and use the <a href="http://sequelizejs.com">Sequelize</a> library as the model layer.</p>
         <p>Now let's define the book model. We can create the book model using the following command:</p>
         <pre><code>$ suki generate model book</code></pre>
-        <p>And 
+        <pre><code>module.exports = class extends Suki.SequelizeModel
+
+  @_define: (DataTypes) ->
+    title: DataTypes.STRING
+    price: DataTypes.INTEGER
+        </code></pre>
         <h3>4. Define the controller</h3>
         <pre><code>$ suki create-controller task</code></pre>
-        <pre><code>module.exports = class extends require('suki').Controller
+        <pre><code>module.exports = class extends Suki.Controller
 
-  # POST /tasks
-  create: ->
-    task = @db.Task.create { title: @req.body.title }
-    @res.json task
+  # GET /books
+  index: (Book) ->
+    @res.json Book.findAll()
 
-  # GET /tasks
-  index: ->
-    @res.json @db.Task.findAll()
+  # POST /books
+  create: (Book) ->
+    @res.json Book.create
+      title: @req.body.title
+      price: @req.body.price
 
-  # GET /tasks/:id
-  get: ->
-    @res.json @_task
+  # GET /books/:bookId
+  show: ->
+    @res.json @book
 
-  # DELETE /tasks/:id
+  # PUT /books/:id
+  update: ->
+    @book.title = req.body.title
+    @book.price = req.body.price
+    @res.json @book.save()
+
+  # DELETE /books/:id
   destroy: ->
-    @_task.destroy()
+    @book.destroy()
     @res.json { "message": "deleted" }
+
         </code></pre>
       </div>
     </header>
