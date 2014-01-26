@@ -1,4 +1,4 @@
-# WORK IN PROGRESS
+# WORK IN PROGRESS ☞ [![Build Status](https://travis-ci.org/luin/Suki.png?branch=master)](https://travis-ci.org/luin/Suki) ლ(´ڡ`ლ)
 
 However, there is a working example in the `example` folder
 
