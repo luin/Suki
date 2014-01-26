@@ -59,6 +59,8 @@ Suki = (option = {}) ->
 
     app.set model.modelName, model.model
 
+  # Init associations for Sequelize
+  for model in models then model._initAssociations?()
   app
 
 Suki.Controller = require './Controller'
