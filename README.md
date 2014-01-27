@@ -4,6 +4,8 @@ However, there is a working example in the `example` folder.
 
 * * *
 
+Suki means *like*(好き) in Japanese.
+
 # Get started
 
 ## Build a RESTful API within 2 minutes
