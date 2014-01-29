@@ -92,11 +92,11 @@ module.exports = class extends Suki.SequelizeModel
 module.exports = class extends Suki.Controller
 
   # GET /books
-  index: (Book) ->
+  index: ->
     @res.json Book.findAll()
 
   # POST /books
-  create: (Book) ->
+  create: ->
     @res.json Book.create
       title: @req.body.title
       price: @req.body.price
