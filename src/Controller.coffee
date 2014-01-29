@@ -1,4 +1,5 @@
 utils = require './utils'
+async = require 'async'
 
 module.exports = Controller = class
   @baseURL = ''
@@ -54,19 +55,30 @@ module.exports = Controller = class
       action: action
       condition: condition
 
+  _fetchInjections: (actionName) ->
+    [req, res] = [@req, @res]
+    services = req.app.get 'suki.services'
+    getInjections = (fn) ->
+      injections = utils.di fn.toString()
+      injections.map (injection) ->
+        if req.app.get injection
+          (callback) ->
+            callback null, req.app.get injection
+        else if services?[injection]
+          (callback) ->
+            services[injection] req, res, callback
+
+        else throw new Error "Can't find the injection #{injection}"
+
+    injections = getInjections @[actionName]
+    async.parallel injections, (err, result) =>
+      if err
+        @next err
+      else
+        @[actionName] result...
+
   @_mapToRoute: (app, option) ->
     # define getInjections
-    injectionsCache = {}
-    getInjections = (fn) ->
-      fn = fn.toString()
-      injections =
-        if injectionsCache[fn]
-          injectionsCache[fn]
-        else
-          injectionsCache[fn] = utils.di(fn)
-      injections.map (injection) ->
-        if app.get injection then app.get injection
-        else throw new Error "Can't find the injection #{injection}"
 
     for own action, body of @prototype
       do (action, body) =>
@@ -126,7 +138,7 @@ module.exports = Controller = class
               middlewares.push (req, res, next) ->
                 instance = req.__suki_controller_instance
                 instance.next = next
-                instance.load getInjections(instance.load)...
+                instance._fetchInjections 'load'
           else
             currentLoadActionName += utils.capitalize resource
             if @prototype["load#{currentLoadActionName}"] and
@@ -134,9 +146,7 @@ module.exports = Controller = class
               middlewares.push (req, res, next) ->
                 instance = req.__suki_controller_instance
                 instance.next = next
-                instance["load#{currentLoadActionName}"](
-                  getInjections(instance["load#{currentLoadActionName}"])...
-                )
+                instance._fetchInjections "load#{currentLoadActionName}"
 
         # Apply beforeAction
         if @_beforeActions
@@ -151,16 +161,14 @@ module.exports = Controller = class
               middlewares.push (req, res, next) ->
                 instance = req.__suki_controller_instance
                 instance.next = next
-                instance[beforeAction.action](
-                  getInjections(beforeAction.action[action])...
-                )
+                instance._fetchInjections beforeAction.action
             else if typeof beforeAction.action is 'function'
               middlewares.push beforeAction.action
 
         middlewares.push (req, res, next) ->
           instance = req.__suki_controller_instance
           instance.next = next
-          instance[action] getInjections(instance[action])...
+          instance._fetchInjections action
 
         method = @supportActions[resources.action].method
         app[method] @baseURL + resources.url, middlewares

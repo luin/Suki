@@ -62,6 +62,15 @@ Suki = (option = {}) ->
   if config.sequelize?.sync
     sequelize.sync()
 
+  # Load services
+  services = {}
+  requireDirectory(path.join appDirectory, 'app', 'services')
+    .forEach (service) ->
+      services[service.moduleName] = service
+
+  app.set 'suki.services', services
+
+
   app
 
 Suki.Controller = require './Controller'

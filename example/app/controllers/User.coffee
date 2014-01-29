@@ -1,9 +1,10 @@
 module.exports = class extends Suki.Controller
 
-  index: ->
+  index: (boy) ->
     @res.json
       controller: @req.controller
       action: @req.action
+      boy: boy
 
   show: ->
     @res.json @user
