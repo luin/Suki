@@ -10,14 +10,14 @@ module.exports = class extends Suki.Controller
 
 
   # Task
-  indexTask: (Task) ->
+  indexTask: ->
     @res.json @user.getTasks()
 
-  showTask: (Task) ->
+  showTask: ->
     @res.json
       name: @task.name()
 
-  loadTask: (Task) ->
+  loadTask: ->
     console.log '======LOAD'
     Task.find
       where:

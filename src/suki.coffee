@@ -20,7 +20,6 @@ requireDirectory = (directory) ->
     instance
 
 Suki = (option = {}) ->
-  # Make `Suki` as a global var
   app = express()
 
   unless option.skipUse
@@ -54,7 +53,7 @@ Suki = (option = {}) ->
       throw new Error 'Missing config for sequelize' unless sequelize
       model._initModel Sequelize, sequelize
 
-    app.set model.modelName, model.model
+    global[model.modelName] = model.model
 
   # Init associations for Sequelize
   for model in models then model._initAssociations?()
