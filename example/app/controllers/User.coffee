@@ -7,7 +7,6 @@ module.exports = class extends Suki.Controller
   show: ->
     @res.json @user
 
-
   # Task
   indexTask: ->
     @user.getTasks().complete (err, tasks) ->
