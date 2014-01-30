@@ -1,4 +1,5 @@
 assert = require 'assert'
+utils  = require '../src/utils'
 Controller = require '../src/Controller'
 
 describe 'Controller', ->
@@ -9,12 +10,15 @@ describe 'Controller', ->
 
     it 'should share between instances', ->
       class A extends Controller
+      oldShow = A.supportActions.show
       A.supportActions.show = 1
 
       class B extends Controller
 
       A.supportActions.show.should.eql 1
       B.supportActions.show.should.eql 1
+
+      Controller.supportActions.show = oldShow
 
   describe '.before', ->
     it 'should not share before-actions between instances', ->
@@ -48,3 +52,61 @@ describe 'Controller', ->
         A._beforeActions[0].action.should.eql '_test_except'
         A._beforeActions[0].condition.should.eql
           except: ['patch', 'put']
+
+  describe '._mapToRoute', ->
+    app = req = res = null
+    invokeMiddlewares = (middlewares) ->
+      continueMiddleware = (index) ->
+        middlewares[index] req, res, ->
+          continueMiddleware index + 1
+
+      continueMiddleware 0
+
+    beforeEach ->
+      # Mock app
+      app = {}
+      ['get', 'post', 'put', 'patch', 'delete'].forEach (method) ->
+        app[method] = (url, middlewares) ->
+          app.url = url
+          app["_#{method}"] = middlewares
+
+      req = { app: app, params: [] }
+      res = {}
+
+    describe 'basic map', ->
+      it 'should map index method correctly', (done) ->
+        class User extends Controller
+          index: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users'
+        invokeMiddlewares app._get
+
+      it 'should map show method correctly', (done) ->
+        class User extends Controller
+          show: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._get
+
+      it 'should map delete method correctly', (done) ->
+        class User extends Controller
+          destroy: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._delete
+

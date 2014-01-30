@@ -12,12 +12,8 @@ requireDirectory = (directory) ->
     '.coffee' is path.extname name
   files = files.map    (name) ->
     instance = require path.join directory, name
-    instance.moduleName    = path.basename name.toLowerCase(), path.extname name
-    instance.routerName    = utils.inflection.toRouter instance.moduleName
-    instance.idName        = utils.inflection.toId instance.moduleName
-    instance.modelName     = utils.inflection.toModel instance.moduleName
-    instance.instanceName  = utils.inflection.toInstance instance.moduleName
-    instance
+    moduleName = path.basename name.toLowerCase(), path.extname name
+    utils.storeNames instance, moduleName
 
 Suki = (option = {}) ->
   app = express()

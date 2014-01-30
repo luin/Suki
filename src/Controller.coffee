@@ -77,7 +77,7 @@ module.exports = Controller = class
       else
         @[actionName] result...
 
-  @_mapToRoute: (app, option) ->
+  @_mapToRoute: (app) ->
     for own action, body of @prototype
       do (action, body) =>
         return unless typeof body is 'function'

@@ -1,14 +1,14 @@
-inflection = require 'inflection'
+inflect = require 'inflection'
 
-exports.inflection =
+inflection = exports.inflection =
   toRouter: (name) ->
-    inflection.pluralize name.toLowerCase()
+    inflect.pluralize name.toLowerCase()
   toModel: (name) ->
-    inflection.singularize inflection.camelize name
+    inflect.singularize inflect.camelize name
   toId: (name) ->
-    "#{inflection.singularize inflection.camelize name, true}Id"
+    "#{inflect.singularize inflect.camelize name.toLowerCase(), true}Id"
   toInstance: (name) ->
-    inflection.singularize inflection.camelize name, true
+    inflect.singularize inflect.camelize name.toLowerCase(), true
 
 exports.capitalize = (word) ->
   word.charAt(0).toUpperCase() + word.slice 1
@@ -40,5 +40,12 @@ clone = exports.clone = (obj) ->
   temp
 
 exports.splitByCapital = (word) ->
-  inflection.underscore(word).split '_'
+  inflect.underscore(word).split '_'
 
+exports.storeNames = (instance, moduleName) ->
+  instance.moduleName    = moduleName
+  instance.routerName    = inflection.toRouter moduleName
+  instance.idName        = inflection.toId moduleName
+  instance.modelName     = inflection.toModel moduleName
+  instance.instanceName  = inflection.toInstance moduleName
+  instance
