@@ -30,7 +30,7 @@ module.exports = Controller = class
       url: '/{{module}}/{{id}}'
     edit:
       method: 'get'
-      url: '/{{module}}/edit'
+      url: '/{{module}}/{{id}}/edit'
     update:
       method: 'put'
       url: '/{{module}}/{{id}}'

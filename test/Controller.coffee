@@ -109,3 +109,76 @@ describe 'Controller', ->
 
         app.url.should.eql '/users/:userId'
         invokeMiddlewares app._delete
+
+      it 'should map patch method correctly', (done) ->
+        class User extends Controller
+          patch: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._patch
+
+      it 'should map patch method correctly', (done) ->
+        class User extends Controller
+          patch: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._patch
+
+      it 'should map create method correctly', (done) ->
+        class User extends Controller
+          create: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users'
+        invokeMiddlewares app._post
+
+      it 'should map new method correctly', (done) ->
+        class User extends Controller
+          new: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/new'
+        invokeMiddlewares app._get
+
+      it 'should map edit method correctly', (done) ->
+        class User extends Controller
+          edit: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId/edit'
+        invokeMiddlewares app._get
+
+      it 'should map update method correctly', (done) ->
+        class User extends Controller
+          update: ->
+            req.app.should.equal app
+            done()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._put
+
