@@ -1,10 +1,8 @@
 module.exports = class extends Suki.Controller
 
-  index: (boy) ->
-    @res.json
-      controller: @req.controller
-      action: @req.action
-      boy: boy
+  index: ->
+    User.findAll().complete (err, tasks) ->
+      @res.json tasks
 
   show: ->
     @res.json @user
@@ -12,14 +10,14 @@ module.exports = class extends Suki.Controller
 
   # Task
   indexTask: ->
-    @res.json @user.getTasks()
+    @user.getTasks().complete (err, tasks) ->
+      @res.json tasks
 
   showTask: ->
     @res.json
       name: @task.name()
 
   loadTask: ->
-    console.log '======LOAD'
     Task.find
       where:
         id: @req.params.taskId
