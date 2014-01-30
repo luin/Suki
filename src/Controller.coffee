@@ -59,7 +59,7 @@ module.exports = Controller = class
     [req, res] = [@req, @res]
     services = req.app.get 'suki.services'
     getInjections = (fn) ->
-      injections = utils.di fn.toString()
+      injections = utils.di fn
       injections.map (injection) ->
         if req.app.get injection
           (callback) ->
@@ -78,8 +78,6 @@ module.exports = Controller = class
         @[actionName] result...
 
   @_mapToRoute: (app, option) ->
-    # define getInjections
-
     for own action, body of @prototype
       do (action, body) =>
         return unless typeof body is 'function'

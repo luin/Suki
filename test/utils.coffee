@@ -4,10 +4,13 @@ describe 'utils', ->
   describe '.di', ->
     it 'should return the arguments list', ->
       func1 = (a, b, c) ->
-      utils.di(func1.toString()).should.eql ['a', 'b', 'c']
+      utils.di(func1).should.eql ['a', 'b', 'c']
+
+      # Test cache
+      utils.di(func1).should.eql ['a', 'b', 'c']
 
       func2 = ->
-      utils.di(func2.toString()).should.eql []
+      utils.di(func2).should.eql []
 
   describe '.clone', ->
     it 'should clone a object', ->

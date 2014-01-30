@@ -1,4 +1,5 @@
 inflection = require 'inflection'
+
 exports.inflection =
   toRouter: (name) ->
     inflection.pluralize name.toLowerCase()
@@ -13,6 +14,8 @@ exports.capitalize = (word) ->
   word.charAt(0).toUpperCase() + word.slice 1
 
 exports.di = (fn) ->
+  fn = fn.toString()
+  return exports.di.cache[fn] if exports.di.cache[fn]
   FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m
   FN_ARG_SPLIT = /,/
   FN_ARG = /^\s*(_?)(\S+?)\1\s*$/
@@ -24,7 +27,9 @@ exports.di = (fn) ->
     arg.replace FN_ARG, (all, underscore, name) ->
       inject.push name
 
-  inject
+  exports.di.cache[fn] = inject
+
+exports.di.cache = {}
 
 clone = exports.clone = (obj) ->
   return obj if obj is null or typeof (obj) isnt "object"
