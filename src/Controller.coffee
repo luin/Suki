@@ -113,10 +113,7 @@ module.exports = Controller = class
             .replace('{{module}}', routerName)
             .replace('{{id}}', ":#{idName}")
 
-        # We got definition.verb url
-        middlewares =
-          if option.resolvePromise is false then []
-          else [utils.resolvePromise]
+        middlewares = []
 
         # Store the controller instance in the `req`
         middlewares.push (req, res, next) =>
