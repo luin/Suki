@@ -167,4 +167,3 @@ module.exports = Controller = class
 
         method = @supportActions[resources.action].method
         app[method] @baseURL + resources.url, middlewares
-

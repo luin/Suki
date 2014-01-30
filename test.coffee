@@ -21,4 +21,3 @@ fs.readdirSync(dir)
 mocha
   .run (failures)->
     process.exit(failures)
-

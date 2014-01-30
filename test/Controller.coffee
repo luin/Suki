@@ -109,4 +109,3 @@ describe 'Controller', ->
 
         app.url.should.eql '/users/:userId'
         invokeMiddlewares app._delete
-
