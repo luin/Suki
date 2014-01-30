@@ -182,3 +182,33 @@ describe 'Controller', ->
         app.url.should.eql '/users/:userId'
         invokeMiddlewares app._put
 
+      it 'should invoke the load method when fetch a instance', (done) ->
+        class User extends Controller
+          show: ->
+            @user.should.have.property 'name', 'boy'
+            req.app.should.equal app
+            done()
+
+          load: ->
+            @user = { name: 'boy' }
+            @next()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._get
+
+      it 'should omit the load method without being defined', (done) ->
+        class User extends Controller
+          show: ->
+            req.app.should.equal app
+            done()
+
+          load: null
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._get
