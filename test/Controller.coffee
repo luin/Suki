@@ -77,7 +77,7 @@ describe 'Controller', ->
       it 'should map index method correctly', (done) ->
         class User extends Controller
           index: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -89,7 +89,7 @@ describe 'Controller', ->
       it 'should map show method correctly', (done) ->
         class User extends Controller
           show: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -101,7 +101,7 @@ describe 'Controller', ->
       it 'should map delete method correctly', (done) ->
         class User extends Controller
           destroy: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -113,19 +113,7 @@ describe 'Controller', ->
       it 'should map patch method correctly', (done) ->
         class User extends Controller
           patch: ->
-            req.app.should.equal app
-            done()
-
-        utils.storeNames User, 'User'
-        User._mapToRoute app
-
-        app.url.should.eql '/users/:userId'
-        invokeMiddlewares app._patch
-
-      it 'should map patch method correctly', (done) ->
-        class User extends Controller
-          patch: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -137,7 +125,7 @@ describe 'Controller', ->
       it 'should map create method correctly', (done) ->
         class User extends Controller
           create: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -149,7 +137,7 @@ describe 'Controller', ->
       it 'should map new method correctly', (done) ->
         class User extends Controller
           new: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -161,7 +149,7 @@ describe 'Controller', ->
       it 'should map edit method correctly', (done) ->
         class User extends Controller
           edit: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -173,7 +161,7 @@ describe 'Controller', ->
       it 'should map update method correctly', (done) ->
         class User extends Controller
           update: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
         utils.storeNames User, 'User'
@@ -186,7 +174,7 @@ describe 'Controller', ->
         class User extends Controller
           show: ->
             @user.should.have.property 'name', 'boy'
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
           load: ->
@@ -199,10 +187,10 @@ describe 'Controller', ->
         app.url.should.eql '/users/:userId'
         invokeMiddlewares app._get
 
-      it 'should omit the load method without being defined', (done) ->
+      it 'should omit the undefined load method', (done) ->
         class User extends Controller
           show: ->
-            req.app.should.equal app
+            @req.app.should.equal app
             done()
 
           load: null
@@ -211,4 +199,54 @@ describe 'Controller', ->
         User._mapToRoute app
 
         app.url.should.eql '/users/:userId'
+        invokeMiddlewares app._get
+
+    describe 'nested map', ->
+      it 'shoud map nested resource correctly', (done) ->
+        class User extends Controller
+          showTask: ->
+            @req.app.should.equal app
+            @user.should.have.property('name', 'boy')
+            @task.should.have.property('title', 'todo')
+            done()
+
+          load: ->
+            @user = { name: 'boy' }
+            @next()
+
+          loadTask: ->
+            @task = { title: 'todo' }
+            @next()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId/tasks/:taskId'
+        invokeMiddlewares app._get
+
+      it 'shoud invoke the `load` methods correctly', (done) ->
+        class User extends Controller
+          indexTaskComment: ->
+            @req.app.should.equal app
+            @user.should.have.property('name', 'boy')
+            @task.should.have.property('title', 'todo')
+            assert not @comment
+            done()
+
+          load: ->
+            @user = { name: 'boy' }
+            @next()
+
+          loadTask: ->
+            @task = { title: 'todo' }
+            @next()
+
+          loadTaskComment: ->
+            @comment = { comment: 'hi' }
+            @next()
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId/tasks/:taskId/comments'
         invokeMiddlewares app._get
