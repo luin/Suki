@@ -70,7 +70,7 @@ describe 'Controller', ->
           app.url = url
           app["_#{method}"] = middlewares
 
-      req = { app: app, params: [] }
+      req = { app: app, params: {} }
       res = {}
 
     describe 'basic map', ->
@@ -172,81 +172,65 @@ describe 'Controller', ->
 
       it 'should invoke the load method when fetch a instance', (done) ->
         class User extends Controller
-          show: ->
+          show: (@user) ->
             @user.should.have.property 'name', 'boy'
             @req.app.should.equal app
             done()
 
-          load: ->
-            @user = { name: 'boy' }
-            @next()
+          loadUser: ->
+            @next null, name: 'boy'
 
         utils.storeNames User, 'User'
         User._mapToRoute app
 
         app.url.should.eql '/users/:userId'
-        invokeMiddlewares app._get
-
-      it 'should omit the undefined load method', (done) ->
-        class User extends Controller
-          show: ->
-            @req.app.should.equal app
-            done()
-
-          load: null
-
-        utils.storeNames User, 'User'
-        User._mapToRoute app
-
-        app.url.should.eql '/users/:userId'
+        req.params =
+          userId: 123
         invokeMiddlewares app._get
 
     describe 'nested map', ->
       it 'shoud map nested resource correctly', (done) ->
         class User extends Controller
-          showTask: ->
+          showTask: (@user, @task) ->
             @req.app.should.equal app
             @user.should.have.property('name', 'boy')
             @task.should.have.property('title', 'todo')
             done()
 
-          load: ->
-            @user = { name: 'boy' }
-            @next()
+          loadUser: ->
+            @next null, name: 'boy'
 
           loadTask: ->
-            @task = { title: 'todo' }
-            @next()
+            @next null, title: 'todo'
 
         utils.storeNames User, 'User'
         User._mapToRoute app
 
         app.url.should.eql '/users/:userId/tasks/:taskId'
+        req.params =
+          userId: 123
+          taskId: ''
         invokeMiddlewares app._get
 
       it 'shoud invoke the `load` methods correctly', (done) ->
         class User extends Controller
-          indexTaskComment: ->
+          indexTaskComment: (@task, @user) ->
             @req.app.should.equal app
             @user.should.have.property('name', 'boy')
             @task.should.have.property('title', 'todo')
-            assert not @comment
             done()
 
-          load: ->
-            @user = { name: 'boy' }
-            @next()
+          loadUser: ->
+            @next null, name: 'boy'
 
           loadTask: ->
-            @task = { title: 'todo' }
-            @next()
-
-          loadTaskComment: ->
-            @comment = { comment: 'hi' }
-            @next()
+            @next null, title: 'todo'
 
         utils.storeNames User, 'User'
         User._mapToRoute app
 
         app.url.should.eql '/users/:userId/tasks/:taskId/comments'
+        req.params =
+          userId: 123
+          taskId: 0
         invokeMiddlewares app._get

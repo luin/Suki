@@ -1,26 +1,39 @@
 module.exports = class extends Suki.Controller
 
-  index: ->
-    User.findAll().complete (err, tasks) ->
-      @res.json tasks
+  @before '_checkPermission', only: 'createTask'
 
-  show: ->
+  # GET /users/:userId
+  show: (@user) ->
     @res.json @user
 
-  # Task
-  indexTask: ->
-    @user.getTasks().complete (err, tasks) ->
-      @res.json tasks
+  # POST /users
+  create: ->
+    unless req.body.name or req.body.password
+      @next new Error 'Invalid params'
+      return
 
-  showTask: ->
-    @res.json
-      name: @task.name()
+    User.create(name: req.body.name, password: req.body.password)
+        .success (user) =>
+          @res.json user
 
-  loadTask: ->
-    Task.find
-      where:
-        id: @req.params.taskId
-    .complete (err, task) =>
-      @task = task
+  # POST /users/:userId/tasks
+  createTask: ->
+    unless req.body.title
+      @next new Error 'Invalid params'
+      return
+
+    Task.create({ title: req.body.title }).success (task) =>
+      @user.addTask task
+      @res.json task
+
+  # GET /users/:userId/tasks
+  listTask: ->
+    @res.json @user.getTasks()
+
+
+  # Private methods
+  _checkPermission: (me) ->
+    if me and me.id is @user.id
       @next()
-
+    else
+      @next new Error 'No permission'

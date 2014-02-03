@@ -50,6 +50,7 @@ Suki = (option = {}) ->
       model._initModel Sequelize, sequelize
 
     global[model.modelName] = model.model
+    app.set "model#{model.modelName}", model.model
 
   # Init associations for Sequelize
   for model in models then model._initAssociations?()

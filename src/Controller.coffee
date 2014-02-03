@@ -56,22 +56,39 @@ module.exports = Controller = class
       condition: condition
 
   _fetchInjections: (actionName) ->
-    [req, res] = [@req, @res]
+    [req, res, self, next] = [@req, @res, @, @next]
     services = req.app.get 'suki.services'
     getInjections = (fn) ->
       injections = utils.di fn
       injections.map (injection) ->
-        if req.app.get injection
+        idName = idName = utils.inflection.toId injection
+        modelName = utils.capitalize injection
+        model = req.app.get "model#{modelName}"
+        if req.params[idName] isnt undefined
+          if self["load#{modelName}"]
+            (callback) ->
+              self.next = (err, result) ->
+                return callback(err) if err
+                # TODO
+                self[injection] = result
+                callback null, result
+              self._fetchInjections "load#{modelName}"
+          else
+            (callback) ->
+              return callback() unless req.params[idName]
+              model.find(req.params[idName]).complete callback
+        else if req.app.get injection
           (callback) ->
             callback null, req.app.get injection
         else if services?[injection]
           (callback) ->
             services[injection] req, res, callback
 
-        else throw new Error "Can't find the injection #{injection}"
+        else throw new Error "Can't find the injection '#{injection}'"
 
     injections = getInjections @[actionName]
-    async.parallel injections, (err, result) =>
+    async.series injections, (err, result) =>
+      @next = next
       if err
         @next err
       else

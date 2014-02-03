@@ -1,7 +1,7 @@
 REPORTER = spec
 
 test:
-	@NODE_ENV=test coffee test.coffee
+	@NODE_ENV=test coffee test_runner.coffee
 
 test-w:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
