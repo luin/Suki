@@ -140,28 +140,6 @@ module.exports = Controller = class
           req.__suki_controller_instance = instance
           next()
 
-        # Auto load
-        currentLoadActionName = ''
-        needLoad = ~@supportActions[resources.action].url.indexOf '{{id}}'
-        for resource, index in resources
-          do (resource, index) =>
-            isntLastResouce = index isnt resources.length - 1
-            if resource is @
-              if @prototype.load and (isntLastResouce or needLoad)
-                middlewares.push (req, res, next) ->
-                  instance = req.__suki_controller_instance
-                  instance.next = next
-                  instance._fetchInjections 'load'
-            else
-              currentLoadActionName += utils.capitalize resource
-              loadActionName = "load#{currentLoadActionName}"
-              if @prototype[loadActionName] and
-                  (isntLastResouce or needLoad)
-                middlewares.push (req, res, next) ->
-                  instance = req.__suki_controller_instance
-                  instance.next = next
-                  instance._fetchInjections loadActionName
-
         # Apply beforeAction
         if @_beforeActions
           @_beforeActions.forEach (beforeAction) ->
