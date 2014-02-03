@@ -1,6 +1,9 @@
-# WORK IN PROGRESS ☞ [![Build Status](https://travis-ci.org/luin/Suki.png?branch=master)](https://travis-ci.org/luin/Suki) ლ(´ڡ`ლ)
+# WORK IN PROGRESS ᕕ( ᐛ )ᕗ
 
 However, there is a working example in the `example` folder.
+
+[![Build Status](https://travis-ci.org/luin/Suki.png?branch=master)](https://travis-ci.org/luin/Suki) [![Dependencies Status](https://david-dm.org/luin/suki.png)](https://david-dm.org/luin/suki)
+
 
 * * *
 
