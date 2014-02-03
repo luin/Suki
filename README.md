@@ -96,26 +96,26 @@ module.exports = class extends Suki.Controller
 
   # GET /books
   index: ->
-    @res.json Book.findAll()
+    Book.findAll().complete (err, books) =>
+      @res.json books
 
   # POST /books
   create: ->
-    @res.json Book.create
-      title: @req.body.title
-      price: @req.body.price
+    (Book.create { title: @req.body.title, price: @req.body.price}).complete (err, book) =>
+      @res.json book
 
   # GET /books/:bookId
-  show: ->
+  show: (@book) ->
     @res.json @book
 
-  # PUT /books/:id
-  update: ->
+  # PUT /books/:bookId
+  update: (@book) ->
     @book.title = req.body.title
     @book.price = req.body.price
     @res.json @book.save()
 
-  # DELETE /books/:id
-  destroy: ->
+  # DELETE /books/:bookId
+  destroy: (@book) ->
     @book.destroy()
     @res.json { "message": "deleted" }
 ```
