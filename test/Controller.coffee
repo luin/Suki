@@ -64,11 +64,16 @@ describe 'Controller', ->
 
     beforeEach ->
       # Mock app
+      objects = {}
       app = {}
       ['get', 'post', 'put', 'patch', 'delete'].forEach (method) ->
         app[method] = (url, middlewares) ->
+          if method is 'get' and not middlewares
+            return objects[url]
           app.url = url
           app["_#{method}"] = middlewares
+
+      app.set = (key, value) -> objects[key] = value
 
       req = { app: app, params: {} }
       res = {}
@@ -233,4 +238,31 @@ describe 'Controller', ->
         req.params =
           userId: 123
           taskId: 0
+        invokeMiddlewares app._get
+
+      it 'shoud invoke the model with the same name by default', (done) ->
+        app.set 'modelTask',
+          find: (id) ->
+            id.should.eql '9976'
+            {
+              complete: (callback) ->
+                callback null, title: 'todo'
+            }
+        class User extends Controller
+          indexTaskComment: (@task, @user) ->
+            @req.app.should.equal app
+            @user.should.have.property('name', 'boy')
+            @task.should.have.property('title', 'todo')
+            done()
+
+          loadUser: ->
+            @next null, name: 'boy'
+
+        utils.storeNames User, 'User'
+        User._mapToRoute app
+
+        app.url.should.eql '/users/:userId/tasks/:taskId/comments'
+        req.params =
+          userId: 123
+          taskId: '9976'
         invokeMiddlewares app._get

@@ -4,17 +4,6 @@ async = require 'async'
 module.exports = Controller = class
   @baseURL = ''
 
-  load: ->
-    klass = @constructor
-    if @req.params[klass.idName] and @req.app.get klass.modelName
-      @req.app.get(klass.modelName)
-        .find(@req.params[klass.idName]).complete (err, result) =>
-          unless err
-            @[klass.instanceName] = result
-          @next err
-    else
-      @next()
-
   @supportActions =
     index:
       method: 'get'
@@ -67,23 +56,21 @@ module.exports = Controller = class
         if req.params[idName] isnt undefined
           if self["load#{modelName}"]
             (callback) ->
-              self.next = (err, result) ->
-                return callback(err) if err
-                # TODO
-                self[injection] = result
-                callback null, result
+              self.next = callback
               self._fetchInjections "load#{modelName}"
           else
             (callback) ->
-              return callback() unless req.params[idName]
-              model.find(req.params[idName]).complete callback
+              if model then model.find(req.params[idName]).complete callback
+              else
+                throw new Error [
+                  "Can't load the injection '#{injection}'.",
+                  "You should either define the `load#{modelName}` action",
+                  "or create a model named '#{modelName}'."
+                ].join(' ')
         else if req.app.get injection
-          (callback) ->
-            callback null, req.app.get injection
+          (callback) -> callback null, req.app.get injection
         else if services?[injection]
-          (callback) ->
-            services[injection] req, res, callback
-
+          (callback) -> services[injection] req, res, callback
         else throw new Error "Can't find the injection '#{injection}'"
 
     injections = getInjections @[actionName]
