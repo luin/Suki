@@ -26,6 +26,10 @@ Suki = (option = {}) ->
   appDirectory =
     option.appDirectory or path.dirname module.parent.parent.filename
 
+  app.set 'views', path.join appDirectory, 'app', 'views'
+  app.set 'view engine', 'jade'
+
+
   # Load controllers
   controllers =
     requireDirectory path.join appDirectory, 'app', 'controllers'

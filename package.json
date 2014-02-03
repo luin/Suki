@@ -18,7 +18,8 @@
     "config": "~0.4.35",
     "yaml": "~0.2.3",
     "mysql": "~2.0.1",
-    "async": "~0.2.10"
+    "async": "~0.2.10",
+    "jade": "~1.1.5"
   },
   "devDependencies": {
     "which": "~1.0.5",

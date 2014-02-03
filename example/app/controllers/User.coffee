@@ -4,7 +4,7 @@ module.exports = class extends Suki.Controller
 
   # GET /users/:userId
   show: (@user) ->
-    @res.json @user
+    @res.render()
 
   # POST /users
   create: ->
@@ -32,8 +32,5 @@ module.exports = class extends Suki.Controller
 
 
   # Private methods
-  _checkPermission: (me) ->
-    if me and me.id is @user.id
-      @next()
-    else
-      @next new Error 'No permission'
+  _checkPermission: (me, @user) ->
+    @next()

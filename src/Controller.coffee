@@ -127,6 +127,29 @@ module.exports = Controller = class
           req.__suki_controller_instance = instance
           next()
 
+        # redefine `res.render`
+        middlewares.push (req, res, next) ->
+          instance = req.__suki_controller_instance
+          render = res.render
+          res.render = (view, locals, callback) ->
+            if typeof locals is 'function'
+              callback = locals
+              locals = undefined
+
+            view = "#{req.controller}/#{req.action}" unless view
+
+            locals = {} unless locals
+
+            for own key, value of instance
+              continue if key[0] is '_'
+              locals[key] = value
+
+            if callback
+              render.call res, view, locals, callback
+            else
+              render.call res, view, locals
+          next()
+
         # Apply beforeAction
         if @_beforeActions
           @_beforeActions.forEach (beforeAction) ->
