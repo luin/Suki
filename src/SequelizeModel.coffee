@@ -1,8 +1,15 @@
 module.exports = class
   @models: {}
 
-  @_type: 'Sequelize'
-  @_initModel: (Sequelize, sequelize) ->
+  @config: (key, value) ->
+    if typeof key is 'object'
+      @config _key, _value for own _key, _value of key
+    else
+      @_config = {} unless @_config
+      @_config[key] = value
+
+  @_initModel: (sequelize) ->
+    @_config = {} unless @_config
     isPrivateMethod = (methodName) ->
       ~['constructor', 'belongsTo', 'hasMany', 'hasOne'].indexOf(methodName) or
       methodName[0] is '_'
@@ -15,9 +22,12 @@ module.exports = class
         continue if isPrivateMethod methodName
         @_config[name][methodName] = method
 
-    @model = sequelize.define @modelName,
-      @_define?(Sequelize),
-      @_config
+    properties = {}
+    for own propertyName, propertyDefination of @prototype
+      continue if typeof propertyDefination is 'function'
+      properties[propertyName] = propertyDefination
+
+    @model = sequelize.define @modelName, properties, @_config
 
     @models[@modelName] = @model
 

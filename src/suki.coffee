@@ -4,7 +4,7 @@ fs      = require 'fs'
 utils   = require './utils'
 config  = require 'config'
 
-Sequelize  = require 'sequelize'
+global.Sequelize  = require 'sequelize'
 
 requireDirectory = (directory) ->
   files = fs.readdirSync directory
