@@ -51,7 +51,7 @@ Suki = (option = {}) ->
   for model in models
     if model._type is 'Sequelize'
       throw new Error 'Missing config for sequelize' unless sequelize
-      model._initModel Sequelize, sequelize
+      model._initModel sequelize
 
     global[model.modelName] = model.model
     app.set "model#{model.modelName}", model.model

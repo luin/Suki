@@ -1,4 +1,5 @@
 utils = require '../src/utils'
+Sequelize  = require 'sequelize'
 
 describe 'utils', ->
   describe '.di', ->
@@ -59,3 +60,33 @@ describe 'utils', ->
         utils.inflection.toInstance('User').should.eql 'user'
         utils.inflection.toInstance('user').should.eql 'user'
         utils.inflection.toInstance('users').should.eql 'user'
+
+    describe '.isSequelizeDataType', ->
+      isSequelizeDataType = utils.isSequelizeDataType
+      it 'should return true when is a datatype', ->
+        isSequelizeDataType(Sequelize.STRING).should.be.true
+        isSequelizeDataType(Sequelize.STRING(15)).should.be.true
+        isSequelizeDataType(Sequelize.STRING.BINARY).should.be.true
+        isSequelizeDataType(Sequelize.TEXT).should.be.true
+        isSequelizeDataType(Sequelize.INTEGER).should.be.true
+        isSequelizeDataType(Sequelize.BIGINT).should.be.true
+        isSequelizeDataType(Sequelize.BIGINT(11)).should.be.true
+        isSequelizeDataType(Sequelize.FLOAT).should.be.true
+        isSequelizeDataType(Sequelize.FLOAT(11)).should.be.true
+        isSequelizeDataType(Sequelize.FLOAT(11, 12)).should.be.true
+        isSequelizeDataType(Sequelize.DECIMAL).should.be.true
+        isSequelizeDataType(Sequelize.DECIMAL(10, 2)).should.be.true
+        isSequelizeDataType(Sequelize.DATE).should.be.true
+        isSequelizeDataType(Sequelize.BOOLEAN).should.be.true
+        isSequelizeDataType(Sequelize.ENUM('value 1', 'vaule 2')).should.be.true
+        isSequelizeDataType(Sequelize.ARRAY(Sequelize.TEXT)).should.be.true
+        isSequelizeDataType(Sequelize.BLOB).should.be.true
+        isSequelizeDataType(Sequelize.BLOB('tiny')).should.be.true
+        isSequelizeDataType(Sequelize.UUID).should.be.true
+
+      it 'should return false when isnt a datatype', ->
+        a = ->
+        b = (a, b, c) ->
+
+        isSequelizeDataType(a).should.be.false
+        isSequelizeDataType(b).should.be.false

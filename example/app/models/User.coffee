@@ -1,12 +1,11 @@
 module.exports = class extends Suki.SequelizeModel
-  @_config:
-    tableName: 'users'
 
-  @_define: (DataTypes) ->
-    name: DataTypes.STRING
-    gender:
-      type: DataTypes.BOOLEAN
-      allowNull: false
-      defaultValue: true
+  @config: tableName: 'users'
+
+  name: Sequelize.STRING
+  gender:
+    type: Sequelize.BOOLEAN
+    allowNull: false
+    defaultValue: true
 
   @hasMany 'Task'

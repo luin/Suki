@@ -49,3 +49,6 @@ exports.storeNames = (instance, moduleName) ->
   instance.modelName     = inflection.toModel moduleName
   instance.instanceName  = inflection.toInstance moduleName
   instance
+
+exports.isSequelizeDataType = (body) ->
+  body.toString().slice(0, 8) isnt 'function'

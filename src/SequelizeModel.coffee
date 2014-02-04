@@ -1,4 +1,8 @@
+{ isSequelizeDataType } = require './utils'
+
 module.exports = class
+  @_type: 'Sequelize'
+
   @models: {}
 
   @config: (key, value) ->
@@ -19,12 +23,14 @@ module.exports = class
       where = if name is 'instanceMethods' then @prototype else @
       for own methodName, method of where
         continue unless typeof method is 'function'
+        continue if isSequelizeDataType method
         continue if isPrivateMethod methodName
         @_config[name][methodName] = method
 
     properties = {}
     for own propertyName, propertyDefination of @prototype
       continue if typeof propertyDefination is 'function'
+      continue unless isSequelizeDataType propertyDefination
       properties[propertyName] = propertyDefination
 
     @model = sequelize.define @modelName, properties, @_config
