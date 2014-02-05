@@ -82,9 +82,8 @@ Now let's define the book model. We can create the book model using the followin
 ```CoffeeScript
 module.exports = class extends Suki.SequelizeModel
 
-  @_define: (DataTypes) ->
-    title: DataTypes.STRING
-    price: DataTypes.INTEGER
+  title: Sequelize.STRING
+  price: Sequelize.INTEGER
 ```
 
 ### 4. Define the controller
